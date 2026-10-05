@@ -12,7 +12,7 @@ twice ("Class … is implemented in both"). As a Swift package, ML Kit shares
 Firebase's single copy of each.
 
 It is consumed by
-[`hoopooh-mlkit-flutter`](https://github.com/OWNER_PLACEHOLDER/hoopooh-mlkit-flutter),
+[`hoopooh-mlkit-flutter`](https://github.com/hoopoohEd/hoopooh-mlkit-flutter),
 the Flutter plugins, which come from upstream PR
 [flutter-ml/google_ml_kit_flutter#890](https://github.com/flutter-ml/google_ml_kit_flutter/pull/890).
 

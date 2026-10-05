@@ -15,7 +15,7 @@
 
 import PackageDescription
 
-let releaseURL = "https://github.com/OWNER_PLACEHOLDER/hoopooh-mlkit-swiftpm/releases/download/9.0.0-hoopooh.1"
+let releaseURL = "https://github.com/hoopoohEd/hoopooh-mlkit-swiftpm/releases/download/9.0.0-hoopooh.1"
 
 let package = Package(
     name: "GoogleMLKitSwiftPM",
