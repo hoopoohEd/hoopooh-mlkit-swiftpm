@@ -6,8 +6,17 @@
 //
 // Only what face detection needs is declared, because Xcode downloads every
 // binary target a package declares (the full upstream is ~680 MB per clean
-// build). The binaries are the upstream 9.0.0-simfix2 zips, re-hosted unchanged
-// as release assets of this repo; checksums are therefore identical upstream.
+// build). The binaries are the upstream 9.0.0-simfix2 zips, re-hosted as
+// release assets of this repo. Four are unchanged (same checksums as upstream).
+//
+// MLKitFaceDetection.xcframework.zip is the upstream zip with
+// GoogleMVFaceDetectorResources.bundle (the face models) removed from both
+// slices; the binaries inside are untouched. ML Kit only looks for that bundle
+// at the top level of the APP bundle ([NSBundle mainBundle] /
+// [NSBundle bundleForClass:], which is the app because ML Kit links
+// statically). Swift Package Manager cannot put a resource there, so the app
+// must ship the bundle itself (hoopooh: ios/Runner/GoogleMVFaceDetectorResources.bundle).
+// Left inside the framework it was dead weight (~10 MB) that ML Kit never found.
 //
 // The shared Google libraries are pinned exactly, as upstream does. Firebase's
 // own ranges contain these versions, so Swift Package Manager resolves a single
@@ -15,7 +24,7 @@
 
 import PackageDescription
 
-let releaseURL = "https://github.com/hoopoohEd/hoopooh-mlkit-swiftpm/releases/download/9.0.0-hoopooh.1"
+let releaseURL = "https://github.com/hoopoohEd/hoopooh-mlkit-swiftpm/releases/download/9.0.0-hoopooh.2"
 
 let package = Package(
     name: "GoogleMLKitSwiftPM",
@@ -58,7 +67,8 @@ let package = Package(
         .binaryTarget(
             name: "MLKitFaceDetection",
             url: "\(releaseURL)/MLKitFaceDetection.xcframework.zip",
-            checksum: "f4aeacb2633c0cf727f2d37c033b17eb53598783c57f063ddf5c239121da3f77"
+            // Upstream minus the resources bundle (see top of file).
+            checksum: "5358526ed489cefa5176dcc0a0ef288b79cadad40ac1a4a9141e83a0ba034d1f"
         ),
         .binaryTarget(
             name: "GoogleToolboxForMac",

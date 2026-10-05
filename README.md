@@ -32,9 +32,27 @@ Changes from upstream:
   product, so the plugin linked barcode scanning just to reach MLKitVision.
 - The binary URLs point at this repo's releases.
 - `Sources/` is unchanged.
+- From `9.0.0-hoopooh.2`, `MLKitFaceDetection.xcframework.zip` no longer
+  contains `GoogleMVFaceDetectorResources.bundle` (the face models). Nothing
+  else in it changed. See "The face models" below.
 
-The zips are the upstream `9.0.0-simfix2` release assets, unchanged; the
-checksums in `Package.swift` are upstream's.
+Four zips are the upstream `9.0.0-simfix2` release assets, unchanged, with
+upstream's checksums. The face-detection zip is the upstream one minus the
+model bundle.
+
+## The face models: the app must ship them
+
+ML Kit looks for `GoogleMVFaceDetectorResources.bundle` only at the top level
+of the app bundle (`[NSBundle mainBundle]`, or `[NSBundle bundleForClass:]`,
+which is the app too because ML Kit links statically). CocoaPods copied it
+there. Swift Package Manager cannot place a resource there, and left inside the
+framework ML Kit never finds it: detection then silently returns **no faces**.
+
+So the consuming app ships the bundle as one of its own resources. hoopooh
+keeps Google's copy in `ios/Runner/GoogleMVFaceDetectorResources.bundle`, added
+to the Runner target's Copy Bundle Resources. It comes from
+`https://dl.google.com/dl/cpdc/f06945444b6acdf3/MLKitFaceDetection-8.0.0.tar.gz`
+(`Resources/GoogleMVFaceDetectorResources`). Update it whenever ML Kit is updated.
 
 ## What was verified (Oct 2026)
 
@@ -55,8 +73,9 @@ simulators. `Sources/MLKitAbseilStubs` is compiled only for the arm64 simulator
 
 ## Publishing
 
-1. Push this repo, then create the tag and a GitHub release named
-   `9.0.0-hoopooh.1` (the version is in `releaseURL` in `Package.swift`).
+1. Push this repo, then create the tag and a GitHub release named after the
+   version in `releaseURL` in `Package.swift` (currently `9.0.0-hoopooh.2`).
+   Every release needs all five zips: the URLs point at a single release.
 2. Upload the five files from `release-assets/` (git-ignored) to that release,
    under these exact names:
    `MLImage.xcframework.zip`, `MLKitCommon.xcframework.zip`,
