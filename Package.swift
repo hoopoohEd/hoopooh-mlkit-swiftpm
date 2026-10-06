@@ -21,9 +21,22 @@
 // The shared Google libraries are pinned exactly, as upstream does. Firebase's
 // own ranges contain these versions, so Swift Package Manager resolves a single
 // copy of each. Bumping Firebase may require bumping these pins.
+//
+// From 9.0.0-hoopooh.3, GoogleToolboxForMac is built from source instead of
+// upstream's prebuilt GoogleToolboxForMac.xcframework. That binary was an
+// unsigned dynamic framework, and GoogleToolboxForMac is on Apple's list of
+// commonly used SDKs, so App Store Connect rejected the app (ITMS-91065:
+// Missing signature). Built from source it links statically into the app and
+// no framework ships. ML Kit only needs GTMLogger and the NSData+zlib category,
+// so just those files are vendored (Sources/GoogleToolboxForMac, from
+// google/google-toolbox-for-mac v6.0.1, Apache 2.0, unmodified). Depending on
+// Google's package instead fails in Xcode: its header-only GTMDefines target
+// produces no GTMDefines.o, which the link step still expects.
 
 import PackageDescription
 
+// The four ML Kit zips have not changed since 9.0.0-hoopooh.2, so they are
+// still served from that release.
 let releaseURL = "https://github.com/hoopoohEd/hoopooh-mlkit-swiftpm/releases/download/9.0.0-hoopooh.2"
 
 let package = Package(
@@ -70,10 +83,11 @@ let package = Package(
             // Upstream minus the resources bundle (see top of file).
             checksum: "5358526ed489cefa5176dcc0a0ef288b79cadad40ac1a4a9141e83a0ba034d1f"
         ),
-        .binaryTarget(
+        // GTMLogger + GTMNSData+zlib from google-toolbox-for-mac (see top of file).
+        .target(
             name: "GoogleToolboxForMac",
-            url: "\(releaseURL)/GoogleToolboxForMac.xcframework.zip",
-            checksum: "0ffe7a585b36875b7eda993d1c1cdedeb55e5d0cafb66ddd45e5b341f658e0af"
+            resources: [.copy("Resources/PrivacyInfo.xcprivacy")],
+            linkerSettings: [.linkedLibrary("z")]
         ),
         .target(
             name: "Common",
